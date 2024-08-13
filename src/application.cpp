@@ -1,11 +1,12 @@
 #include "../include/application.hpp"
 #include "../include/services/clock.hpp"
 #include "../include/services/client.hpp"
-
+#include "../include/services/queue.hpp"
 // Constructor implementation
-Application::Application(boost::asio::io_context& io_context, boost::asio::ssl::context& ssl_ctx) {
-    clock_ = std::make_shared<Clock>(io_context);
-    client_ = std::make_shared<Client>(io_context, ssl_ctx); // Pass the SSL context to the Client
+Application::Application(boost::asio::io_context& ioc, boost::asio::ssl::context& ssl_ctx) {
+    clock_ = std::make_shared<Clock>(ioc);
+    client_ = std::make_shared<Client>(ioc, ssl_ctx); // Pass the SSL context to the Client
+    queue_ = std::make_shared<Queue>(ioc, std::chrono::milliseconds(100), std::chrono::milliseconds(0));
 }
 
 // Accessor for Clock
@@ -18,3 +19,4 @@ std::shared_ptr<Client> Application::get_client() const {
     return client_;
 }
 
+std::shared_ptr<Queue> Application::get_queue() const { return queue_; }

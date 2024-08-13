@@ -3,6 +3,7 @@
 
 #include "services/clock.hpp"
 #include "services/client.hpp"
+#include "services/queue.hpp"
 #include <memory>
 #include <string>
 #include <boost/asio.hpp>
@@ -16,10 +17,11 @@ public:
     // Accessors to get the Clock and Client services
     std::shared_ptr<Clock> get_clock() const;
     std::shared_ptr<Client> get_client() const;
-
+    std::shared_ptr<Queue> get_queue() const;
 private:
     std::shared_ptr<Clock> clock_;
     std::shared_ptr<Client> client_;
+    std::shared_ptr<Queue> queue_;
 };
 
 #endif // APPLICATION_HPP

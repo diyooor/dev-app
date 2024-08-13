@@ -15,24 +15,26 @@ http::response<http::string_body> send_(
     res.keep_alive(req.keep_alive());
     res.body() = body;
     res.prepare_payload();
+    std::cout << "[handle_request] Sending response: " << res << "\n";
     return res;
 }
 
-    template <class Body, class Allocator>
+template <class Body, class Allocator>
 http::message_generator handle_post_request(
         http::request<Body, http::basic_fields<Allocator>>&& req,
         std::shared_ptr<Application> app)
 {
-    // Minimal POST request handling: Always return OK
+    std::cout << "[handle_post_request] Processing POST request\n";
     return send_(req, http::status::ok, R"({"message": "POST request processed"})");
 }
 
-    template <class Body, class Allocator>
+template <class Body, class Allocator>
 http::message_generator handle_get_request(
         beast::string_view doc_root,
         http::request<Body, http::basic_fields<Allocator>>&& req,
         std::shared_ptr<Application> app)
 {
+    std::cout << "[handle_get_request] Processing GET request for target: " << req.target() << "\n";
 
     try {
         std::string path = path_cat(doc_root, req.target());
@@ -45,16 +47,19 @@ http::message_generator handle_get_request(
         body.open(path.c_str(), beast::file_mode::scan, ec);
 
         if (ec == beast::errc::no_such_file_or_directory) {
+            std::cout << "[handle_get_request] Resource not found: " << path << "\n";
             return send_(req, http::status::not_found, "The resource was not found.");
         }
 
         if (ec) {
+            std::cout << "[handle_get_request] Error opening file: " << ec.message() << "\n";
             return send_(req, http::status::internal_server_error, "Error: " + ec.message());
         }
 
         auto const size = body.size();
 
         if (req.method() == http::verb::head) {
+            std::cout << "[handle_get_request] HEAD request for: " << path << "\n";
             http::response<http::empty_body> res{http::status::ok, req.version()};
             res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
             res.set(http::field::content_type, mime_type(path));
@@ -63,6 +68,7 @@ http::message_generator handle_get_request(
             return res;
         }
 
+        std::cout << "[handle_get_request] Serving file: " << path << " with size: " << size << "\n";
         http::response<http::file_body> res{
             std::piecewise_construct,
                 std::make_tuple(std::move(body)),
@@ -74,35 +80,34 @@ http::message_generator handle_get_request(
         res.keep_alive(req.keep_alive());
         return res;
     } catch (const std::exception& e) {
+        std::cout << "[handle_get_request] Exception caught: " << e.what() << "\n";
         return send_(req, http::status::internal_server_error, R"({"error": ")" + std::string(e.what()) + "\"}");
     }
 }
 
-    template <class Body, class Allocator>
+template <class Body, class Allocator>
 http::message_generator handle_request(
         beast::string_view doc_root,
         http::request<Body, http::basic_fields<Allocator>>&& req,
         std::shared_ptr<Application> app)
 {
-    /*
-    app->get_clock()->wait(10, [app](){
-            std::cout << "10 seconds have passed." << std::endl;
-            try {
-            // Assuming the target and port are defined within the context
-            //std::string response = app->get_client()->get("example.com", "80", "/");
-            //std::cout << "Response from GET request: " << response << std::endl;
-            } catch (const std::exception& e) {
-            std::cerr << "GET request failed: " << e.what() << std::endl;
-            }
-            });
-    */
-    if (req.method() == http::verb::post && req.target() == "/") {
-        return handle_post_request(std::move(req), app);
-    } else if (req.method() == http::verb::get || req.method() == http::verb::head) {
-        return handle_get_request(doc_root, std::move(req), app);
-    } else {
-        return send_(req, http::status::bad_request, "Unknown HTTP-method");
-    }
+    std::cout << "[handle_request] Received request: " << req << "\n";
+
+    auto response_promise = std::make_shared<std::promise<http::message_generator>>();
+    auto response_future = response_promise->get_future();
+
+    app->get_queue()->enqueue([doc_root, req = std::move(req), app, response_promise]() mutable {
+        std::cout << "[handle_request] Handling request for target: " << req.target() << "\n";
+        if (req.method() == http::verb::post && req.target() == "/") {
+            response_promise->set_value(handle_post_request(std::move(req), app));
+        } else if (req.method() == http::verb::get || req.method() == http::verb::head) {
+            response_promise->set_value(handle_get_request(doc_root, std::move(req), app));
+        } else {
+            response_promise->set_value(send_(req, http::status::bad_request, "Unknown HTTP-method"));
+        }
+    });
+
+    return response_future.get();
 }
 
 beast::string_view mime_type(beast::string_view path)
