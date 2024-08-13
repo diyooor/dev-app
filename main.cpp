@@ -45,23 +45,22 @@ int main(int argc, char* argv[])
         doc_root,
         app)->run();
 
-    // Initialize the Clock and Client services with the SSL context
-    auto clock = std::make_shared<Clock>(ioc);
-    auto client = std::make_shared<Client>(ioc, ctx);
-
-    // Initialize Test service
-    auto testService = std::make_shared<Test>(clock, client);
-
-    // Run the first GET test after 5 seconds
-    testService->TestGet("sattar.xyz", "8080", "/", 5, [testService](const std::string& response) {
-        std::cout << "GET Test Response: " << response << std::endl;
-
-        // After the first test completes, start the second POST test with a slight delay
-        testService->TestPost("sattar.xyz", "8080", "/", "param1=value1&param2=value2", 2, [](const std::string& response) {
-            std::cout << "POST Test Response: " << response << std::endl;
-        });
-    });
-
+//     // Initialize the Clock and Client services with the SSL context
+//     auto clock = std::make_shared<Clock>(ioc);
+//     auto client = std::make_shared<Client>(ioc, ctx);
+// 
+//     // Initialize Test service
+//     auto testService = std::make_shared<Test>(clock, client);
+// 
+//     testService->TestGet("sattar.xyz", "8080", "/", 1, [testService](const std::string& response) {
+//             std::cout << "GET Test Response: " << response << std::endl;
+// 
+//             // After the first test completes, start the second POST test with a slight delay
+//             testService->TestPost("sattar.xyz", "8080", "/", "param1=value1&param2=value2", 1, [](const std::string& response) {
+//                    std::cout << "POST Test Response: " << response << std::endl;
+//             });
+//     });
+// 
     // Run the I/O context in multiple threads
     std::vector<std::thread> v;
     v.reserve(threads - 1);
