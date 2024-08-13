@@ -24,14 +24,12 @@ The ```Queue``` class provides a flexible and configurable mechanism for managin
 - Rate Limiting: Controls the rate at which requests are processed, preventing the server from being overwhelmed.
 - Throttling: Introduces configurable delays between processing batches of requests, allowing for controlled resource usage.
 
-The ```Queue``` integrates seamlessly with the ```Clock``` and ```Client``` to ensure smooth and efficient request handling in high-load scenarios.
-
-### Clock
-The `Clock` class is responsible for managing sessions. It handles operations such as starting, and cancelling timers when the user logs out, and uses `RedisService` to remove expired, and invalid sessions.
-
 ### Client
 The `Client` class manages HTTP requests to external services, allowing the application to act as an HTTP client. It can send GET requests to specified hosts and ports, retrieve responses, and manage connections.
 
+### Clock
+The Clock class demonstrates basic asynchronous timing using Boost.Asio, providing a simple mechanism for scheduling tasks without blocking other operations
+.
 ### Compiling
 
 To compile the application, use the following command:
