@@ -5,7 +5,17 @@ To compile and run this application, ensure the following libraries and tools ar
 - **g++** (C++17 or later)
 - **Boost Libraries**:
 - **OpenSSL** (for SSL/TLS support)
+
 ## Features
+
+### Log
+The `Log` class provides a centralized logging mechanism for the application. It supports:
+
+- **Log Levels**: Configurable log levels (DEBUG, INFO, WARN, ERROR) to control the verbosity of the log output.
+- **Output Configuration**: Logs can be directed to the console, a file, or both, depending on the configuration.
+- **Thread Safety**: Ensures that log entries are consistently handled in multi-threaded environments.
+
+The `Log` class integrates seamlessly with other services, allowing for comprehensive logging across the entire application.
 
 ### Queue
 The ```Queue``` class provides a flexible and configurable mechanism for managing the flow of incoming HTTP requests within the application. It supports:
@@ -27,7 +37,7 @@ The `Client` class manages HTTP requests to external services, allowing the appl
 To compile the application, use the following command:
 
 ```bash
-g++ -std=c++17 main.cpp src/http_tools.cpp src/listener.cpp src/session.cpp src/application.cpp src/services/clock.cpp src/services/queue.cpp src/services/test.cpp src/services/client.cpp -o main -lboost_system -lboost_filesystem -lboost_thread -lssl -lcrypto -lpthread
+g++ -std=c++17 main.cpp src/http_tools.cpp src/listener.cpp src/session.cpp src/application.cpp src/services/clock.cpp src/services/queue.cpp src/services/test.cpp src/services/client.cpp src/services/log.cpp -o main -lboost_system -lboost_filesystem -lboost_thread -lssl -lcrypto -lpthread
 ```
 
 ## Running the Application
