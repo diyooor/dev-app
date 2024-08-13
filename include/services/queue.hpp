@@ -44,7 +44,7 @@ private:
     std::queue<RequestHandler> request_queue_;
     
     // Mutex to protect access to the queue
-    std::mutex queue_mutex;
+    std::mutex queue_mutex_;
 
     // Timer for handling delays between requests.
     boost::asio::steady_timer timer_;
