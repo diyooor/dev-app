@@ -1,7 +1,5 @@
 #include "../../include/services/queue.hpp"
-#include <iostream>
-#include <iomanip>
-#include <sstream>
+#include "../../include/services/log.hpp"  // Include the Log service
 
 // Constructor implementation
 Queue::Queue(boost::asio::io_context& ioc,
@@ -11,21 +9,20 @@ Queue::Queue(boost::asio::io_context& ioc,
       rate_limit_(rate_limit),
       throttle_time_(throttle_time),
       timer_(ioc) {
-    std::cout << "[Queue] Initialized with rate limit: " << rate_limit.count()
-              << " ms, throttle time: " << throttle_time.count() << " ms\n";
+    Log::get().log(Level::INFO, "[Queue] Initialized with rate limit: " + std::to_string(rate_limit.count()) +
+                                  " ms, throttle time: " + std::to_string(throttle_time.count()) + " ms");
 }
-
 
 // Destructor implementation
 Queue::~Queue() {
-    std::cout << "[Queue] Destructor called, cleaning up resources.\n";
+    Log::get().log(Level::INFO, "[Queue] Destructor called, cleaning up resources.");
 }
 
 void Queue::enqueue(RequestHandler handler) {
     {
         std::lock_guard<std::mutex> lock{queue_mutex_};
         request_queue_.push(std::move(handler));
-        std::cout << "[Queue] Request enqueued. Queue size: " << request_queue_.size() << "\n";
+        Log::get().log(Level::INFO, "[Queue] Request enqueued. Queue size: " + std::to_string(request_queue_.size()));
     }
     if (request_queue_.size() == 1) {
         start();
@@ -33,26 +30,26 @@ void Queue::enqueue(RequestHandler handler) {
 }
 
 void Queue::start() {
-    std::cout << "[Queue] Starting to process the queue.\n";
+    Log::get().log(Level::INFO, "[Queue] Starting to process the queue.");
     process_next();
 }
 
 void Queue::process_next() {
     std::lock_guard<std::mutex> lock{queue_mutex_};
     if (request_queue_.empty()) {
-        std::cout << "[Queue] No more requests to process. Queue is empty.\n";
+        Log::get().log(Level::INFO, "[Queue] No more requests to process. Queue is empty.");
         return;
     }
 
     auto handler = std::move(request_queue_.front());
     request_queue_.pop();
-    std::cout << "[Queue] Processing request. Remaining queue size: " << request_queue_.size() << "\n";
+    Log::get().log(Level::INFO, "[Queue] Processing request. Remaining queue size: " + std::to_string(request_queue_.size()));
 
     handler();
 
     auto delay = rate_limit_ + throttle_time_;
     if (delay.count() > 0) {
-        std::cout << "[Queue] Waiting for " << delay.count() << " ms before processing the next request.\n";
+        Log::get().log(Level::INFO, "[Queue] Waiting for " + std::to_string(delay.count()) + " ms before processing the next request.");
         timer_.expires_after(delay);
         timer_.async_wait([this](const boost::system::error_code& ec) {
             if (!ec) {
@@ -60,7 +57,7 @@ void Queue::process_next() {
             }
         });
     } else {
-        std::cout << "[Queue] No delay configured. Processing the next request immediately.\n";
+        Log::get().log(Level::INFO, "[Queue] No delay configured. Processing the next request immediately.");
         process_next();
     }
 }
