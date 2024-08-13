@@ -28,7 +28,7 @@ The ```Queue``` class provides a flexible and configurable mechanism for managin
 The `Client` class manages HTTP requests to external services, allowing the application to act as an HTTP client. It can send GET requests to specified hosts and ports, retrieve responses, and manage connections.
 
 ### Clock
-The Clock class demonstrates basic asynchronous timing using Boost.Asio, providing a simple mechanism for scheduling tasks without blocking other operations
+The `Clock` class demonstrates basic asynchronous timing using Boost.Asio, providing a simple mechanism for scheduling tasks without blocking other operations
 .
 ### Compiling
 
