@@ -51,9 +51,3 @@ To run the application, use the following command:
 - www: The root directory for serving static files.
 - 2: The number of threads to use for handling requests.
 
-
-This command compiles all the source files into a single executable named main, linking the necessary libraries for Boost, OpenSSL, and Redis++.
-
-### Usage
-
-After compiling, simply run the application with the provided command. The server will start and begin accepting HTTP requests on the specified address and port, with integrated SSL support and Redis-based authentication.
