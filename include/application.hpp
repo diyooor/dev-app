@@ -1,6 +1,7 @@
 #ifndef APPLICATION_HPP
 #define APPLICATION_HPP
 
+#include "services/log.hpp"
 #include "services/clock.hpp"
 #include "services/client.hpp"
 #include "services/queue.hpp"
@@ -18,10 +19,12 @@ public:
     std::shared_ptr<Clock> get_clock() const;
     std::shared_ptr<Client> get_client() const;
     std::shared_ptr<Queue> get_queue() const;
+    std::shared_ptr<Log> get_log() const;
 private:
     std::shared_ptr<Clock> clock_;
     std::shared_ptr<Client> client_;
     std::shared_ptr<Queue> queue_;
+    std::shared_ptr<Log> log_;
 };
 
 #endif // APPLICATION_HPP
