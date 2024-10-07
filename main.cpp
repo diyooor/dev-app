@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
 //             std::cout << "GET Test Response: " << response << std::endl;
 // 
 //             // After the first test completes, start the second POST test with a slight delay
-//             testService->TestPost("sattar.xyz", "8080", "/", "param1=value1&param2=value2", 1, [](const std::string& response) {
+//             testService->TestPost("", "8080", "/", "param1=value1&param2=value2", 1, [](const std::string& response) {
 //                    std::cout << "POST Test Response: " << response << std::endl;
 //             });
 //     });
