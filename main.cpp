@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
 //     // Initialize Test service
 //     auto testService = std::make_shared<Test>(clock, client);
 // 
-//     testService->TestGet("sattar.xyz", "8080", "/", 1, [testService](const std::string& response) {
+//     testService->TestGet("", "8080", "/", 1, [testService](const std::string& response) {
 //             std::cout << "GET Test Response: " << response << std::endl;
 // 
 //             // After the first test completes, start the second POST test with a slight delay
